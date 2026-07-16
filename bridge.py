@@ -18,6 +18,7 @@ app = Flask(__name__)
 driver = None
 lock = threading.Lock()
 current_chat_url = None
+conversation_history = []
 
 # ── Status tracking (polled by plugin for progress bar) ───────────────
 _status = {"phase": "idle", "detail": "", "elapsed": 0, "t0": 0}
@@ -69,6 +70,30 @@ def _set_status(phase, detail=""):
         _status["t0"] = time.time()
     if _status["t0"]:
         _status["elapsed"] = int(time.time() - _status["t0"])
+
+
+def _build_conversation_context(history, max_turns=3):
+    if not history:
+        return ""
+
+    recent_turns = history[-max_turns:]
+    context_lines = []
+    for turn in recent_turns:
+        prompt = (turn.get("prompt") or "").strip()
+        response = (turn.get("response") or "").strip()
+        if prompt:
+            context_lines.append(f"Previous user: {prompt}")
+        if response:
+            context_lines.append(f"Previous assistant: {response}")
+
+    if not context_lines:
+        return ""
+    return "Recent conversation context:\n" + "\n".join(context_lines)
+
+
+def _reset_conversation_history():
+    global conversation_history
+    conversation_history = []
 
 
 # ── Cleanup ───────────────────────────────────────────────────────────
@@ -379,6 +404,8 @@ def send_to_claude(schematic, prompt):
     ensure_alive()
     dismiss_popups()
 
+    conversation_context = _build_conversation_context(conversation_history)
+
     full_prompt = (
         "You are an expert KiCad 9 schematic engineer. "
         "Your output must be a valid .kicad_sch that opens and passes ERC.\n\n"
@@ -467,6 +494,7 @@ def send_to_claude(schematic, prompt):
         "  7. Is the layout spacious and readable?\n\n"
 
         f"EXISTING SCHEMATIC:\n{schematic}\n\n"
+        f"{conversation_context}\n\n"
         f"INSTRUCTION: {prompt}"
     )
 
@@ -533,6 +561,10 @@ def send_to_claude(schematic, prompt):
             else:
                 print(f"  Validated OK ({len(text)} chars)")
                 _set_status("done", f"OK ({len(text)} chars)")
+
+            conversation_history.append({"prompt": prompt, "response": text})
+            if len(conversation_history) > 8:
+                conversation_history[:] = conversation_history[-8:]
             return text
 
         print(".", end="", flush=True)
@@ -547,6 +579,12 @@ def health():
 @app.route("/status")
 def status_route():
     return jsonify(_status)
+
+@app.route("/reset-conversation", methods=["POST"])
+def reset_conversation_route():
+    _reset_conversation_history()
+    return jsonify({"status": "ok"})
+
 
 @app.route("/shutdown", methods=["POST"])
 def shutdown_route():

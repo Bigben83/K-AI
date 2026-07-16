@@ -49,10 +49,12 @@ class AIAssistantDialog(wx.Dialog):
         self.apply_btn.SetDefault()
         self.undo_btn = wx.Button(panel, label="Undo Last")
         self.undo_btn.Disable()
+        self.reset_btn = wx.Button(panel, label="Reset Context")
         self.close_btn = wx.Button(panel, wx.ID_CANCEL, "Close")
         btn_row = wx.BoxSizer(wx.HORIZONTAL)
         btn_row.Add(self.apply_btn, 0, wx.RIGHT, 8)
         btn_row.Add(self.undo_btn, 0, wx.RIGHT, 8)
+        btn_row.Add(self.reset_btn, 0, wx.RIGHT, 8)
         btn_row.AddStretchSpacer()
         btn_row.Add(self.close_btn)
         vbox.Add(btn_row, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 10)
@@ -94,6 +96,7 @@ class AIAssistantDialog(wx.Dialog):
         # ── Events ────────────────────────────────────────────
         self.apply_btn.Bind(wx.EVT_BUTTON, self._on_apply)
         self.undo_btn.Bind(wx.EVT_BUTTON, self._on_undo)
+        self.reset_btn.Bind(wx.EVT_BUTTON, self._on_reset_context)
         self.close_btn.Bind(wx.EVT_BUTTON, self._on_close)
         self.Bind(wx.EVT_CLOSE, self._on_close)
 
@@ -147,6 +150,16 @@ class AIAssistantDialog(wx.Dialog):
         if self._undo_callback:
             self._undo_callback()
 
+    def _on_reset_context(self, _):
+        try:
+            from ai_client import reset_conversation_history
+            if reset_conversation_history():
+                self.log("  Context reset. The next prompt will start a fresh conversation thread.")
+            else:
+                self.log("  Context reset requested, but the bridge did not acknowledge it.")
+        except Exception as exc:
+            self.log(f"  Context reset failed: {exc}")
+
     def _on_close(self, evt):
         if self._worker and self._worker.is_alive():
             wx.MessageBox(
@@ -197,6 +210,8 @@ class AIAssistantDialog(wx.Dialog):
     def _set_busy(self, busy):
         self.apply_btn.Enable(not busy)
         self.prompt.Enable(not busy)
+        self.undo_btn.Enable(not busy and self.undo_btn.IsEnabled())
+        self.reset_btn.Enable(not busy)
         self.close_btn.Enable(not busy)
         self.apply_btn.SetLabel("Working..." if busy else "Apply Edit")
         if not busy:
