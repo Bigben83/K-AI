@@ -17,7 +17,8 @@ No API billing. No key setup. Just your Claude account.
 
 ## Requirements
 
-- KiCad 9
+- KiCad 7 or 8
+- Python 3.x (bundled with KiCad)
 - Google Chrome
 - A Claude account (claude.ai) — the better the model, the better the output
 
@@ -25,48 +26,44 @@ No API billing. No key setup. Just your Claude account.
 
 ## Installation
 
-### 1. Open the Plugin Directory
+### 1. Place the plugin folder
 
-In KiCad PCB Editor go to **Tools → External Plugins → Open Plugin Directory**
+Open KiCad PCB Editor, then:
 
-![Step 1 - Open Plugin Directory](https://raw.githubusercontent.com/colaco1123/K-AI/main/K-AI/assets/images/step1.png)
+```
+Tools > Scripting Console > Open Plugin Directory
+```
 
----
+Copy the `KI-AI` folder into that directory.
 
-### 2. Place the K-AI Folder
+### 2. Run the install script
 
-Copy the `K-AI` folder into the plugin directory that just opened
-![Step 3 - File contents](https://raw.githubusercontent.com/colaco1123/K-AI/main/K-AI/assets/images/step2.png)
+Navigate into the `KI-AI` folder and run:
 
+- **Windows:** double-click `1_INSTALL.bat`
+- **Mac/Linux:** run `bash 1_INSTALL.sh` in terminal
 
----
+This installs the required dependencies (browser driver, etc.).
 
-### 3. Run the Install Script
+### 3. Refresh plugins
 
-Open the `K-AI` folder and double-click **`1_INSTALL`** — this installs the required dependencies
-![Step 4 - K-AI toolbar icon](https://raw.githubusercontent.com/colaco1123/K-AI/main/K-AI/assets/images/step4.png)
+In KiCad:
+```
+Tools > Plugin and Scripting Console > Refresh Plugins
+```
 
-
-
----
-
-
-
-### 4. Refresh Plugins & Launch
-
-Go back to KiCad → **Tools → External Plugins → Refresh Plugins**
-
-The **K-AI icon** will appear in your toolbar (the green square icon)
+The **K-AI** button will appear in your toolbar.
 
 ---
 
 ## First-Time Setup
 
-1. Run **`2_START_BRIDGE`** from the K-AI folder
-2. A Chrome window will open — **log in to claude.ai once**
-3. Click the K-AI toolbar icon — the assistant dialog will open
+1. Click the K-AI plugin button
+2. Run `2_START_BRIDGE` to launch the bridge
+3. A Chrome window will open — **log in to claude.ai** once
+4. You're ready to go
 
-> ⚠️ Keep the Chrome window open while using the plugin
+> ⚠️ Keep the Chrome window open while using the plugin. It's used to send and receive messages.
 
 ---
 
@@ -74,19 +71,17 @@ The **K-AI icon** will appear in your toolbar (the green square icon)
 
 1. Open a schematic in KiCad
 2. Click the **K-AI** toolbar button
-3. Type your instruction in the prompt box (e.g. *"Add a decoupling cap to the VCC rail"*)
-4. Click **Apply Edit** and wait for Claude to respond
+3. Type your prompt (e.g. *"Add a decoupling cap to the VCC rail"*)
+4. Wait for Claude to respond and apply changes
 
-![K-AI Dialog](https://raw.githubusercontent.com/colaco1123/K-AI/main/K-AI/assets/images/step3.png)
-
-**Tip:** Claude Sonnet or Opus will give faster and more accurate results than Haiku.
+**Tip:** Claude Sonnet or Opus will give faster and more accurate schematic results than Haiku.
 
 ---
 
 ## File Structure
 
 ```
-K-AI/
+KI-AI/
 ├── __init__.py          # Plugin entry point
 ├── 1_INSTALL            # Dependency installer
 ├── 2_START_BRIDGE       # Launches the Chrome bridge
@@ -97,7 +92,7 @@ K-AI/
 ```
 
 ---
-![Step 2 - Place K-AI folder](https://raw.githubusercontent.com/colaco1123/K-AI/main/K-AI/assets/images/step5.png)
+
 ## Known Limitations
 
 - Chrome must stay open during use
@@ -130,5 +125,5 @@ MIT License — free to use, modify, and distribute.
 
 ## Author
 
-Built by Shay Colaco — aerospace engineer and embedded systems developer.  
+Built by [Your Name] — an aerospace engineering student and embedded systems developer.  
 If you find this useful, leave a ⭐ on the repo!
