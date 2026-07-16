@@ -1,4 +1,5 @@
 import unittest
+from unittest import mock
 
 import bridge
 
@@ -26,6 +27,15 @@ class ConversationHistoryTests(unittest.TestCase):
         bridge._reset_conversation_history()
 
         self.assertEqual(bridge.conversation_history, [])
+
+    def test_ensure_alive_recovers_when_browser_check_raises(self):
+        bridge.driver = object()
+
+        with mock.patch.object(bridge, "is_alive", side_effect=RuntimeError("session not created")), \
+             mock.patch.object(bridge, "start_browser") as start_browser_mock:
+            bridge.ensure_alive()
+
+        start_browser_mock.assert_called_once_with()
 
 
 if __name__ == "__main__":

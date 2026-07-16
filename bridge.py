@@ -190,13 +190,21 @@ def is_alive():
 
 
 def ensure_alive():
-    global driver
-    if not is_alive():
-        try:
+    global driver, current_chat_url
+    try:
+        if is_alive():
+            return
+    except Exception:
+        pass
+
+    current_chat_url = None
+    try:
+        if driver is not None:
             driver.quit()
-        except:
-            pass
-        start_browser()
+    except Exception:
+        pass
+    driver = None
+    start_browser()
 
 
 # ── Extraction helpers ────────────────────────────────────────────────

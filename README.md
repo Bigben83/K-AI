@@ -95,7 +95,7 @@ KI-AI/
 
 ## Known Limitations
 
-- Chrome must stay open during use
+- The bridge will automatically reopen the Chrome session if the window is closed during use
 - First-time login to claude.ai is manual (by design)
 - Complex schematics may hit Claude's context window
 - Response time depends on Claude plan and model selected
