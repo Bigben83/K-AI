@@ -100,7 +100,7 @@ K-AI/
 ![Step 2 - Place K-AI folder](https://raw.githubusercontent.com/colaco1123/K-AI/main/K-AI/assets/images/step5.png)
 ## Known Limitations
 
-- Chrome must stay open during use
+- The bridge will automatically reopen the Chrome session if the window is closed during use
 - First-time login to claude.ai is manual (by design)
 - Complex schematics may hit Claude's context window
 - Response time depends on Claude plan and model selected
